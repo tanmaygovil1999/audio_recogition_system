@@ -15,6 +15,8 @@ except ImportError:
 from termcolor import colored
 from libs.config import get_config
 from libs.db_sqlite import SqliteDatabase
+from libs.visualiser_console import VisualiserConsole as visual_peak
+from libs.visualiser_plot import VisualiserPlot as visual_plot
 from libs.reader_file import FileReader
 
 # song = None
@@ -111,6 +113,11 @@ if __name__ == '__main__':
   print(channel_amount)
   result = set()
   matches = []
+
+  def grouper(iterable, n, fillvalue=None):
+    args = [iter(iterable)] * n
+    return (filter(None, values) for values
+            in zip_longest(fillvalue=fillvalue, *args))
 
   def find_matches(samples, Fs=fingerprint.DEFAULT_FS):
     hashes = fingerprint.fingerprint(samples, Fs=Fs)
