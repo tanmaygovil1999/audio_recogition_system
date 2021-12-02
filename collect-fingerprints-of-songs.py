@@ -54,9 +54,9 @@ if __name__ == '__main__':
         channel_hashes = set(channel_hashes)
 
         msg = '   finished channel %d/%d, got %d hashes'
-        print colored(msg, attrs=['dark']) % (
+        print(colored(msg, attrs=['dark']) % (
           channeln+1, channel_amount, len(channel_hashes)
-        )
+        ))
 
         hashes |= channel_hashes
 
@@ -67,7 +67,7 @@ if __name__ == '__main__':
         values.append((song_id, hash, offset))
 
       msg = '   storing %d hashes in db' % len(values)
-      print colored(msg, 'green')
+      print(colored(msg, 'green'))
 
       db.store_fingerprints(values)
 
