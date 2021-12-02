@@ -1,11 +1,16 @@
-from db import Database
-from config import get_config
+# from db import Database
+from libs.config import get_config
 import sqlite3
 import sys
-from itertools import izip_longest
+try:
+    # Python 3
+    from itertools import zip_longest
+except ImportError:
+    # Python 2
+    from itertools import izip_longest as zip_longest
 from termcolor import colored
 
-class SqliteDatabase(Database):
+class SqliteDatabase():
   TABLE_SONGS = 'songs'
   TABLE_FINGERPRINTS = 'fingerprints'
 
@@ -79,7 +84,7 @@ class SqliteDatabase(Database):
     def grouper(iterable, n, fillvalue=None):
       args = [iter(iterable)] * n
       return (filter(None, values) for values
-          in izip_longest(fillvalue=fillvalue, *args))
+          in zip_longest(fillvalue=fillvalue, *args))
 
     for split_values in grouper(values, 1000):
       query = "INSERT OR IGNORE INTO %s (%s) VALUES (?, ?, ?)" % (table, ", ".join(columns))
@@ -91,3 +96,31 @@ class SqliteDatabase(Database):
     query = 'SELECT count(*) FROM %s WHERE song_fk = %d' % (self.TABLE_FINGERPRINTS, song_id)
     rows = self.executeOne(query)
     return int(rows[0])
+
+  def get_song_by_filehash(self, filehash):
+    return self.findOne(self.TABLE_SONGS, {
+      "filehash": filehash
+    })
+
+  def get_song_by_id(self, id):
+    return self.findOne(self.TABLE_SONGS, {
+      "id": id
+    })
+
+  def add_song(self, filename, filehash):
+    song = self.get_song_by_filehash(filehash)
+
+    if not song:
+      song_id = self.insert(self.TABLE_SONGS, {
+        "name": filename,
+        "filehash": filehash
+      })
+    else:
+      song_id = song[0]
+
+    return song_id
+
+  def store_fingerprints(self, values):
+    self.insertMany(self.TABLE_FINGERPRINTS,
+      ['song_fk', 'hash', 'offset'], values
+    )
