@@ -6,7 +6,12 @@ import libs.fingerprint as fingerprint
 import argparse
 
 from argparse import RawTextHelpFormatter
-from itertools import izip_longest
+try:
+    # Python 3
+    from itertools import zip_longest
+except ImportError:
+    # Python 2
+    from itertools import izip_longest as zip_longest
 from termcolor import colored
 from libs.config import get_config
 from libs.reader_microphone import MicrophoneReader
@@ -75,7 +80,7 @@ if __name__ == '__main__':
   def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     return (filter(None, values) for values
-            in izip_longest(fillvalue=fillvalue, *args))
+            in zip_longest(fillvalue=fillvalue, *args))
 
   data = reader.get_recorded_data()
 
