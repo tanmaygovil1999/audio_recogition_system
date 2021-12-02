@@ -29,19 +29,27 @@ from libs.reader_file import FileReader
 
 if __name__ == '__main__':
   config = get_config()
-  r = FileReader(None)
+  r = FileReader()
   db = SqliteDatabase()
 
   parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
   parser.add_argument('-s', '--seconds', nargs='?')
+  parser.add_argument("-o", "--objective",
+                        help="Choose from objectives like personalization, content_mining, data_migration", type=str,
+                        default="personalization")
   args = parser.parse_args()
+
 
   if not args.seconds:
     parser.print_help()
     sys.exit(0)
 
+  if str(args.__dict__["objective"]):
+    filename = str(args.objective)
+  print(filename)
   seconds = int(args.seconds)
-  result = r.parse_audio(seconds=seconds)
+  result = r.parse_audio(filename)
+  print("result", result)
   # chunksize = 2**12  # 4096
   # channels = 2#int(config['channels']) # 1=mono, 2=stereo
 
@@ -97,9 +105,10 @@ if __name__ == '__main__':
   # # reader.save_recorded('test.wav')
 
 
-  Fs = fingerprint.DEFAULT_FS
+  Fs = result['Fs']
+  data = result['channels']
   channel_amount = len(data)
-
+  print(channel_amount)
   result = set()
   matches = []
 

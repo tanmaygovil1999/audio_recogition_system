@@ -1,14 +1,14 @@
-from libs.reader import BaseReader
+# from libs.reader import BaseReader
 import os
 from pydub import AudioSegment
 from pydub.utils import audioop
 import numpy as np
 from hashlib import sha1
 
-class FileReader(BaseReader):
-  def __init__(self, filename):
+class FileReader():
+  # def __init__(self, filename):
     # super(FileReader, self).__init__(a)
-    self.filename = filename
+    # filename = filename
 
   """
   Reads any file supported by pydub (ffmpeg) and returns the data contained
@@ -22,14 +22,14 @@ class FileReader(BaseReader):
   returns: (channels, samplerate)
   """
   # pydub does not support 24-bit wav files, use wavio when this occurs
-  def parse_audio(self):
+  def parse_audio(self, filename):
     limit = None
     # limit = 10
 
-    songname, extension = os.path.splitext(os.path.basename(self.filename))
+    songname, extension = os.path.splitext(os.path.basename(filename))
 
     try:
-      audiofile = AudioSegment.from_file(self.filename)
+      audiofile = AudioSegment.from_file(filename)
 
       if limit:
         audiofile = audiofile[:limit * 1000]
@@ -61,10 +61,10 @@ class FileReader(BaseReader):
       "extension": extension,
       "channels": channels,
       "Fs": audiofile.frame_rate,
-      "file_hash": self.parse_file_hash()
+      "file_hash": self.parse_file_hash(filename=filename)
     }
 
-  def parse_file_hash(self, blocksize=2**20):
+  def parse_file_hash(self, filename, blocksize=2**20):
     """ Small function to generate a hash to uniquely generate
     a file. Inspired by MD5 version here:
     http://stackoverflow.com/a/1131255/712997
@@ -73,7 +73,7 @@ class FileReader(BaseReader):
     """
     s = sha1()
 
-    with open(self.filename , "rb") as f:
+    with open(filename , "rb") as f:
       while True:
         buf = f.read(blocksize)
         if not buf: break
